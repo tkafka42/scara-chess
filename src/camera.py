@@ -11,6 +11,7 @@ SQ = SIZE // 8
 points = []
 MIN_MOVE_SCORE = 8.0
 
+
 def on_click(event, x, y, flags, param):
     if event == cv2.EVENT_LBUTTONDOWN and len(points) < 4:
         points.append((x, y))
@@ -136,8 +137,8 @@ def detect_move(board, scores):
             best_score = weakest
             best_move = move
 
-    if best_score < MIN_MOVE_SCORE:     
-        return None, best_score         
+    if best_score < MIN_MOVE_SCORE:
+        return None, best_score
 
     return best_move, best_score
 

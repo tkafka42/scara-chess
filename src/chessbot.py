@@ -7,5 +7,3 @@ points = []
 ELO = 1500
 
 # Camera
-
-# coming soon lol

@@ -57,13 +57,11 @@ if __name__ == "__main__":
         status = "ok" if ticks == expected else f"WRONG, expected {expected}"
         print(f"{angle:>3} deg -> {ticks} ticks  {status}")
 
-    
     for height, expected in ((0, 0.0), (84, 150.4), (100, 179.0)):
         angle = height_to_angle(height)
         status = "ok" if abs(angle - expected) < 0.1 else f"WRONG, expected {expected}"
         print(f"{height:>3} mm  -> {angle:.1f} deg  {status}")
 
-    
     x, y = square_to_xy(4, 3)
     theta1, theta2 = inverse_kinematics(x, y)
     for joint, value, expected in (("shoulder", theta1, 94.1), ("elbow", theta2, 70.8)):
@@ -71,7 +69,6 @@ if __name__ == "__main__":
         status = "ok" if abs(angle - expected) < 0.1 else f"WRONG, expected {expected}"
         print(f"e4 {joint:<8} -> {angle:.1f} deg  {status}")
 
-    
     for joint, value in (("z", 120), ("wrist", 10)):
         try:
             joint_to_servo_angle(joint, value)

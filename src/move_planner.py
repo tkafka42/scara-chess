@@ -41,23 +41,71 @@ def move_promotion(board, move):
     return actions
 
 
+def move_capture(board, move):
+    return [(move.to_square, BOX), (move.from_square, move.to_square)]
+
+
+def move_classic(board, move):
+    return [(move.from_square, move.to_square)]
+
+
+def move_to_actions(board, move):
+    if board.is_en_passant(move):
+        return move_enpassant(board, move)
+    elif board.is_castling(move):
+        return move_castling(board, move)
+    elif move.promotion:
+        return move_promotion(board, move)
+    elif board.is_capture(move):
+        return move_capture(board, move)
+    else:
+        return move_classic(board, move)
+
+
 if __name__ == "__main__":
-    board = chess.Board()
-    for san in ["e4", "a6", "e5", "d5"]:
-        board.push_san(san)
-    move = chess.Move.from_uci("e5d6")
-    for frm, to in move_enpassant(board, move):
-        print(
-            frm if frm in (BOX, RESERVE) else chess.square_name(frm),
-            "->",
-            to if to in (BOX, RESERVE) else chess.square_name(to),
-        )
-    board = chess.Board("r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1")
-    for uci in ["e1g1", "e1c1"]:
-        print(uci, move_castling(board, chess.Move.from_uci(uci)))
 
-    board = chess.Board("8/P7/8/8/8/8/8/k6K w - - 0 1")
-    print(move_promotion(board, chess.Move.from_uci("a7a8q")))
+    def name(location):
+        return location if location in (BOX, RESERVE) else chess.square_name(location)
 
-    board = chess.Board("1n6/P7/8/8/8/8/8/k6K w - - 0 1")
-    print(move_promotion(board, chess.Move.from_uci("a7b8q")))
+    tests = [
+        (None, [], "e2e4", [("e2", "e4")]),
+        (None, ["e4", "d5"], "e4d5", [("d5", "box"), ("e4", "d5")]),
+        (None, ["e4", "a6", "e5", "d5"], "e5d6", [("d5", "box"), ("e5", "d6")]),
+        (
+            "r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1",
+            [],
+            "e1g1",
+            [("e1", "g1"), ("h1", "f1")],
+        ),
+        (
+            "r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1",
+            [],
+            "e1c1",
+            [("e1", "c1"), ("a1", "d1")],
+        ),
+        (
+            "8/P7/8/8/8/8/8/k6K w - - 0 1",
+            [],
+            "a7a8q",
+            [("a7", "box"), ("reserve", "a8")],
+        ),
+        (
+            "1n6/P7/8/8/8/8/8/k6K w - - 0 1",
+            [],
+            "a7b8q",
+            [("b8", "box"), ("a7", "box"), ("reserve", "b8")],
+        ),
+    ]
+
+    ok = 0
+    for fen, before, uci, expected in tests:
+        board = chess.Board(fen) if fen else chess.Board()
+        for san in before:
+            board.push_san(san)
+        actions = move_to_actions(board, chess.Move.from_uci(uci))
+        result = [(name(a), name(b)) for a, b in actions]
+        if result == expected:
+            ok += 1
+        else:
+            print(f"{uci}: got {result}, expected {expected}")
+    print(f"{ok}/{len(tests)} ok")

@@ -32,6 +32,15 @@ def move_castling(board, move):
     return [(move.from_square, move.to_square), (rook_from, rook_to)]
 
 
+def move_promotion(board, move):
+    actions = []
+    if board.is_capture(move):
+        actions.append((move.to_square, BOX))
+    actions.append((move.from_square, BOX))
+    actions.append((RESERVE, move.to_square))
+    return actions
+
+
 if __name__ == "__main__":
     board = chess.Board()
     for san in ["e4", "a6", "e5", "d5"]:
@@ -46,3 +55,9 @@ if __name__ == "__main__":
     board = chess.Board("r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1")
     for uci in ["e1g1", "e1c1"]:
         print(uci, move_castling(board, chess.Move.from_uci(uci)))
+
+    board = chess.Board("8/P7/8/8/8/8/8/k6K w - - 0 1")
+    print(move_promotion(board, chess.Move.from_uci("a7a8q")))
+
+    board = chess.Board("1n6/P7/8/8/8/8/8/k6K w - - 0 1")
+    print(move_promotion(board, chess.Move.from_uci("a7b8q")))
